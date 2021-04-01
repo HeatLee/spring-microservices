@@ -1,0 +1,1 @@
+alter table script add column filename_extension varchar(5);
