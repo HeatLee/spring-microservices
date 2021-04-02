@@ -7,10 +7,12 @@ import com.task.microservicesscripts.repository.ScriptRepository;
 import com.task.microservicesscripts.service.ScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.text.SimpleDateFormat;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ScriptServiceImpl implements ScriptService {
@@ -34,32 +36,51 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     @Override
-    public Script addScript(Script script) throws WrongScriptDataException{
-        if (script.getCommand().length == 0) {
+    public Script addScript(String name,
+                            String description,
+                            MultipartFile command) throws WrongScriptDataException{
+        try {
+            return scriptRepository.save(buildScript(name, description, command));
+        } catch (IOException e) {
             throw new WrongScriptDataException();
         }
-        script.setCreatedAt(Calendar.getInstance());
-        script.setModifiedAt(Calendar.getInstance());
-        return scriptRepository.save(script);
     }
 
     @Override
-    public Script updateScript(int id, Script newScript) throws ScriptNotFoundException{
-        return scriptRepository.findById(id)
-                .map(script -> {
-                    script.setName(newScript.getName() != null ? newScript.getName():script.getName());
-                    script.setDescription(newScript.getDescription());
-                    script.setCommand(newScript.getCommand());
-                    script.setCreatedAt(newScript.getCreatedAt());
-                    script.setModifiedAt(newScript.getModifiedAt());
-                    script.setFilenameExtension(newScript.getFilenameExtension());
-                    return scriptRepository.save(script);
-                })
-                .orElseThrow(() -> new ScriptNotFoundException(id));
+    public Script updateScript(int id,
+                               String newName,
+                               String newDescription,
+                               MultipartFile newCommand) throws ScriptNotFoundException{
+        return new Script();
     }
 
     @Override
     public void deleteScript(int id) {
+        scriptRepository.deleteById(id);
+    }
 
+    @Override
+    public int run(int scriptId) {
+        return 0;
+    }
+
+    private Script buildScript(String name,
+                               String description,
+                               MultipartFile command) throws IOException, WrongScriptDataException {
+        Script script = new Script();
+        script.setName(name);
+        script.setDescription(description);
+        script.setCommand(command.getBytes());
+
+        String fileName = command.getOriginalFilename();
+        String fileExtension = Objects.requireNonNull(fileName).substring(
+                fileName.indexOf(".")+1, fileName.length());
+        if (fileExtension.length() == 0) {
+            throw new WrongScriptDataException();
+        }
+        script.setFilenameExtension(fileExtension);
+        script.setCreatedAt(Calendar.getInstance());
+        script.setModifiedAt(Calendar.getInstance());
+        return script;
     }
 }
