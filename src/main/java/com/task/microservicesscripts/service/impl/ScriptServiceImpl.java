@@ -50,8 +50,17 @@ public class ScriptServiceImpl implements ScriptService {
     public Script updateScript(int id,
                                String newName,
                                String newDescription,
-                               MultipartFile newCommand) throws ScriptNotFoundException{
-        return new Script();
+                               MultipartFile file)
+            throws ScriptNotFoundException, IOException, WrongScriptDataException {
+        Script oldScript = scriptRepository.getOne(id);
+        oldScript.setName(newName != null && newName.length() > 0 ?
+                newName : oldScript.getName());
+        oldScript.setDescription(newDescription != null && newDescription.length() > 0 ?
+                newDescription : oldScript.getDescription());
+        oldScript.setFilenameExtension(getFilenameExtension(file));
+        oldScript.setCommand(file.getBytes());
+        oldScript.setModifiedAt(Calendar.getInstance());
+        return scriptRepository.save(oldScript);
     }
 
     @Override
@@ -61,26 +70,32 @@ public class ScriptServiceImpl implements ScriptService {
 
     @Override
     public int run(int scriptId) {
+        //todo  runService
         return 0;
     }
 
     private Script buildScript(String name,
                                String description,
-                               MultipartFile command) throws IOException, WrongScriptDataException {
+                               MultipartFile file) throws IOException, WrongScriptDataException {
         Script script = new Script();
         script.setName(name);
         script.setDescription(description);
-        script.setCommand(command.getBytes());
+        script.setCommand(file.getBytes());
 
-        String fileName = command.getOriginalFilename();
+
+        script.setFilenameExtension(getFilenameExtension(file));
+        script.setCreatedAt(Calendar.getInstance());
+        script.setModifiedAt(Calendar.getInstance());
+        return script;
+    }
+
+    private String getFilenameExtension(MultipartFile file) throws WrongScriptDataException {
+        String fileName = file.getOriginalFilename();
         String fileExtension = Objects.requireNonNull(fileName).substring(
                 fileName.indexOf(".")+1, fileName.length());
         if (fileExtension.length() == 0) {
             throw new WrongScriptDataException();
         }
-        script.setFilenameExtension(fileExtension);
-        script.setCreatedAt(Calendar.getInstance());
-        script.setModifiedAt(Calendar.getInstance());
-        return script;
+        return fileExtension;
     }
 }

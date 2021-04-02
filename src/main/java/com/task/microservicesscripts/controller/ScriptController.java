@@ -14,6 +14,7 @@ import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -50,13 +51,19 @@ public class ScriptController {
     public Script updateScript(@PathVariable int id,
                                @RequestParam String newName,
                                @RequestParam String newDescription,
-                               @RequestPart("file") MultipartFile newCommand) throws ScriptNotFoundException {
+                               @RequestPart("file") MultipartFile newCommand)
+            throws ScriptNotFoundException, IOException, WrongScriptDataException {
         return service.updateScript(id, newName, newDescription, newCommand);
     }
 
     @DeleteMapping("/scripts/{id}")
     public void deleteScript(@PathVariable int id) {
         service.deleteScript(id);
+    }
+
+    @PostMapping("/scripts/{id}/run")
+    public int runScript(@PathVariable int id) {
+        return service.run(id);
     }
 
     @ResponseBody
@@ -67,7 +74,7 @@ public class ScriptController {
     }
 
     @ResponseBody
-    @ExceptionHandler(WrongScriptDataException.class)
+    @ExceptionHandler({WrongScriptDataException.class, IOException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     String handleBadRequestException(Exception exception) {
         return exception.getMessage();
