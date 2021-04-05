@@ -16,6 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ScriptController {
@@ -62,8 +63,14 @@ public class ScriptController {
     }
 
     @PostMapping("/scripts/{id}/run")
-    public int runScript(@PathVariable int id) {
-        return service.run(id);
+    public int runScript(@PathVariable int id,
+                         @RequestBody Map<String, String> args) {
+        return service.run(id, args);
+    }
+
+    @GetMapping("/scripts/{id}/error")
+    public String getError(@PathVariable int id) {
+        return service.getError(id);
     }
 
     @ResponseBody
