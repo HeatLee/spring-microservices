@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public interface ScriptService {
     List<Script> getAll();
@@ -24,5 +25,7 @@ public interface ScriptService {
 
     void deleteScript(int id);
 
-    int run(int scriptId);
+    int run(int scriptId, Map<String, List<String>> args);
+
+    String getError(int scriptId);
 }
