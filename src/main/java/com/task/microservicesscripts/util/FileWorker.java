@@ -106,6 +106,11 @@ public class FileWorker {
 
     private static void addArgs(List<String> out,
                                 Map<String, List<String>> args) {
-        args.
+        args.keySet().forEach(s -> {
+                    if (s.length() > 0) {
+                        out.add(s);
+                    }
+                    out.addAll(args.get(s));
+                });
     }
 }

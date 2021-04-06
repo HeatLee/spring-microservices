@@ -17,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 @RestController
 public class ScriptController {
@@ -64,7 +65,7 @@ public class ScriptController {
 
     @PostMapping("/scripts/{id}/run")
     public int runScript(@PathVariable int id,
-                         @RequestBody Map<String, List<String>> args) {
+                         @RequestBody SortedMap<String, List<String>> args) {
         return service.run(id, args);
     }
 

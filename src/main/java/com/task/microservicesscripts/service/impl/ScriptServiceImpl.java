@@ -82,7 +82,7 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     @Override
-    public int run(int scriptId, Map<String, String> args) {
+    public int run(int scriptId, Map<String, List<String>> args) {
         int exitCode;
         try {
             Script script = scriptRepository.getOne(scriptId);
