@@ -64,7 +64,7 @@ public class ScriptController {
 
     @PostMapping("/scripts/{id}/run")
     public int runScript(@PathVariable int id,
-                         @RequestBody Map<String, String> args) {
+                         @RequestBody Map<String, List<String>> args) {
         return service.run(id, args);
     }
 

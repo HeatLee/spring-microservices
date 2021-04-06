@@ -25,7 +25,7 @@ public interface ScriptService {
 
     void deleteScript(int id);
 
-    int run(int scriptId, Map<String, String> args);
+    int run(int scriptId, Map<String, List<String>> args);
 
     String getError(int scriptId);
 }
